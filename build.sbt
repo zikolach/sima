@@ -6,8 +6,17 @@ lazy val root = (project in file("."))
   .settings(
     name := "sima"
   )
-  .settings ( BuildSettings.settings * )
-  .settings ( libraryDependencies ++= Dependencies.allDependencies)
-  .settings ( scalacOptions ++= Seq("-unchecked", "-deprecation", "-Xfatal-warnings", "-Xlint", "-feature") )
+  .settings(BuildSettings.settings *)
+  .settings(libraryDependencies ++= Dependencies.allDependencies)
+  .settings(
+    scalacOptions ++= Seq(
+      "-Ymacro-annotations",
+      "-unchecked",
+      "-deprecation",
+      "-Xfatal-warnings",
+//      "-Xlint",
+      "-feature"
+    )
+  )
 
 releasePublishArtifactsAction := PgpKeys.publishSigned.key

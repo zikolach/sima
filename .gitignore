@@ -2,4 +2,4 @@
 .idea/
 project/target/
 target/
-test.webp
+src/test/resources/test.webp
