@@ -1,4 +1,4 @@
-import api.ImageInfo
+import api.{ImageInfo, Parameters}
 import cats.effect.testing.scalatest.AsyncIOSpec
 import org.scalatest.flatspec.AsyncFlatSpec
 import org.scalatest.matchers.should
@@ -26,11 +26,27 @@ class SimaClientTest extends AsyncFlatSpec with AsyncIOSpec with should.Matchers
 
   it should "request image resize" in {
     val image = getClass.getResourceAsStream("test.webp").readAllBytes()
-    println(image.size)
     implicit val clientConfig: ClientConfig = ClientConfig()
-    SimaClient.client.resize(image)(20).asserting { result =>
+    SimaClient.client.resize(image)(Parameters(width = Some(20))).asserting { result =>
       Files.write(Path.of("out.webp"), result)
       result.length should be(394)
+    }
+  }
+
+  it should "convert svg to png" in {
+    val image = getClass.getResourceAsStream("debian.svg").readAllBytes()
+    implicit val clientConfig: ClientConfig = ClientConfig()
+    SimaClient.client.convert(image)(Parameters(`type` = Some("png"))).asserting { result =>
+      Files.write(Path.of("out.png"), result)
+      new String(result.slice(1, 4)) should be("PNG")
+    }
+  }
+  it should "convert svg to png and fit" in {
+    val image = getClass.getResourceAsStream("debian.svg").readAllBytes()
+    implicit val clientConfig: ClientConfig = ClientConfig()
+    SimaClient.client.convert(image)(Parameters(`type` = Some("png"), width = Some(50))).asserting { result =>
+      Files.write(Path.of("fit.png"), result)
+      new String(result.slice(1, 4)) should be("PNG")
     }
   }
 }
