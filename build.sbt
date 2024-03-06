@@ -1,0 +1,13 @@
+ThisBuild / version := "0.1.0-SNAPSHOT"
+
+ThisBuild / scalaVersion := "2.13.13"
+
+lazy val root = (project in file("."))
+  .settings(
+    name := "sima"
+  )
+  .settings ( BuildSettings.settings * )
+  .settings ( libraryDependencies ++= Dependencies.allDependencies)
+  .settings ( scalacOptions ++= Seq("-unchecked", "-deprecation", "-Xfatal-warnings", "-Xlint", "-feature") )
+
+releasePublishArtifactsAction := PgpKeys.publishSigned.key
