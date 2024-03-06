@@ -1,8 +1,8 @@
 import api.{ImageInfo, Parameters}
+import cats.effect.IO
 import cats.effect.testing.scalatest.AsyncIOSpec
 import org.scalatest.flatspec.AsyncFlatSpec
 import org.scalatest.matchers.should
-
 import java.nio.file.{Files, Path}
 
 class SimaClientTest extends AsyncFlatSpec with AsyncIOSpec with should.Matchers {
@@ -10,7 +10,7 @@ class SimaClientTest extends AsyncFlatSpec with AsyncIOSpec with should.Matchers
 
   it should "request service status" in {
     implicit val clientConfig: ClientConfig = ClientConfig()
-    SimaClient.client.health.asserting { result =>
+    SimaClient.client[IO].use(_.health).asserting { result =>
       result should be(true)
     }
   }
@@ -19,7 +19,7 @@ class SimaClientTest extends AsyncFlatSpec with AsyncIOSpec with should.Matchers
     val image = getClass.getResourceAsStream("test.webp").readAllBytes()
     println(image.size)
     implicit val clientConfig: ClientConfig = ClientConfig()
-    SimaClient.client.info(image).asserting { result =>
+    SimaClient.client[IO].use(_.info(image)).asserting { result =>
       result should be(ImageInfo(100, 100, "webp", "srgb", hasAlpha = false, hasProfile = false, 3, 1))
     }
   }
@@ -27,7 +27,7 @@ class SimaClientTest extends AsyncFlatSpec with AsyncIOSpec with should.Matchers
   it should "request image resize" in {
     val image = getClass.getResourceAsStream("test.webp").readAllBytes()
     implicit val clientConfig: ClientConfig = ClientConfig()
-    SimaClient.client.resize(image)(Parameters(width = Some(20))).asserting { result =>
+    SimaClient.client[IO].use(_.resize(image)(Parameters(width = Some(20)))).asserting { result =>
       Files.write(Path.of("out.webp"), result)
       result.length should be(394)
     }
@@ -36,17 +36,33 @@ class SimaClientTest extends AsyncFlatSpec with AsyncIOSpec with should.Matchers
   it should "convert svg to png" in {
     val image = getClass.getResourceAsStream("debian.svg").readAllBytes()
     implicit val clientConfig: ClientConfig = ClientConfig()
-    SimaClient.client.convert(image)(Parameters(`type` = Some("png"))).asserting { result =>
+    SimaClient.client[IO].use(_.convert(image)(Parameters(`type` = Some("png")))).asserting { result =>
       Files.write(Path.of("out.png"), result)
       new String(result.slice(1, 4)) should be("PNG")
     }
   }
+
   it should "convert svg to png and fit" in {
     val image = getClass.getResourceAsStream("debian.svg").readAllBytes()
     implicit val clientConfig: ClientConfig = ClientConfig()
-    SimaClient.client.convert(image)(Parameters(`type` = Some("png"), width = Some(50))).asserting { result =>
+    SimaClient.client[IO].use(_.convert(image)(Parameters(`type` = Some("png"), width = Some(50)))).asserting { result =>
       Files.write(Path.of("fit.png"), result)
       new String(result.slice(1, 4)) should be("PNG")
+    }
+  }
+
+  it should "do multiple operations" in {
+    implicit val clientConfig: ClientConfig = ClientConfig()
+    SimaClient.client[IO].use { sc =>
+      for {
+        image   <- IO.blocking(getClass.getResourceAsStream("debian.svg").readAllBytes())
+        healthy <- sc.health
+        info    <- sc.info(image)
+      } yield healthy -> info
+    } asserting {
+      case (h, i) =>
+        h should be(true)
+        i.width should be(100)
     }
   }
 }
