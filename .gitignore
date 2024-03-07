@@ -5,3 +5,5 @@ target/
 /out.*
 /*.png
 /*.webp
+/*.svg
+/*.jpg

@@ -9,6 +9,7 @@ import org.apache.pekko.http.scaladsl.model._
 import org.apache.pekko.http.scaladsl.server.Directives._
 import org.apache.pekko.stream.Materializer
 import sima.SimaClient
+import sima.api.Parameters
 
 import scala.concurrent.Future
 import scala.io.StdIn
@@ -47,6 +48,33 @@ object Main {
                   implicit val config = sima.ClientConfig()
                   SimaClient.client[IO].use(_.info(bytes)).unsafeToFuture().map { info =>
                     HttpEntity(ContentTypes.`application/json`, info.asJson.noSpaces)
+                  }
+                }
+              }
+            }
+        }
+      }
+    } ~ path("resize") {
+      get {
+        complete {
+          import cats.effect.unsafe.implicits.global
+          implicit val config = sima.ClientConfig()
+          SimaClient.client[IO].use(_.health).unsafeToFuture().map { b =>
+            HttpEntity(b.toString)
+          }
+        }
+      } ~ post {
+        fileUpload("file") {
+          case (metadata, byteSource) =>
+            extractRequestContext { ctx =>
+              implicit val mat: Materializer = ctx.materializer
+              val fileBytes: Future[Array[Byte]] = byteSource.map(_.iterator.toArray).runFold(Array.empty[Byte])((acc, next) => acc.appendedAll(next))
+              onSuccess(fileBytes) { bytes =>
+                complete {
+                  import cats.effect.unsafe.implicits.global
+                  implicit val config = sima.ClientConfig()
+                  SimaClient.client[IO].use(_.resize(bytes)(Parameters(`type` = Some("png"), width = Some(200)))).unsafeToFuture().map { resized =>
+                    HttpEntity(ContentType(MediaTypes.`image/png`), resized)
                   }
                 }
               }
