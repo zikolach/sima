@@ -66,5 +66,15 @@ object Dependencies {
   val miscDependencies = Seq(catsEffect, sttp, sttpCE, circeCore, circeGeneric, circeParser)
   val testDependencies = Seq(scalatest, catsScalaTest)
 
+  val PekkoVersion = "1.0.2"
+  val PekkoHttpVersion = "1.0.1"
+  val pekkoActorTyped = "org.apache.pekko" %% "pekko-actor-typed" % PekkoVersion
+  val pekkoStream = "org.apache.pekko" %% "pekko-stream" % PekkoVersion
+  val pekkoHttp = "org.apache.pekko" %% "pekko-http" % PekkoHttpVersion
+  val scalatags = "com.lihaoyi" %% "scalatags" % "0.8.2"
+  // val tapirPekko = "com.softwaremill.sttp.tapir" %% "tapir-pekko-http-server" % "1.9.11"
+
+  val demoDependencies = Seq(pekkoActorTyped, pekkoStream, pekkoHttp, scalatags)
+
   val allDependencies = miscDependencies ++ testDependencies
 }

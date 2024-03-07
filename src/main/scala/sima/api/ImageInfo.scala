@@ -1,4 +1,4 @@
-package api
+package sima.api
 
 import io.circe.generic.JsonCodec
 

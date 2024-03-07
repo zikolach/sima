@@ -1,6 +1,6 @@
-package api
+package sima.api
 
-import api.Parameters.{allowedParams, Endpoint}
+import Parameters.{allowedParams, Endpoint}
 import io.circe.Json
 import io.circe.syntax.EncoderOps
 

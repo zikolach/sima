@@ -1,8 +1,10 @@
-import api.{ImageInfo, Parameters}
 import cats.effect.IO
 import cats.effect.testing.scalatest.AsyncIOSpec
 import org.scalatest.flatspec.AsyncFlatSpec
 import org.scalatest.matchers.should
+import sima.{ClientConfig, SimaClient}
+import sima.api.{ImageInfo, Parameters}
+
 import java.nio.file.{Files, Path}
 
 class SimaClientTest extends AsyncFlatSpec with AsyncIOSpec with should.Matchers {

@@ -1,8 +1,10 @@
-import api.{ImageInfo, Parameters}
+package sima
+
 import cats.implicits._
 import cats.effect.{Async, Resource}
 import io.circe.parser._
-import sttp.client3.{asByteArrayAlways, asStringAlways, basicRequest, Response, UriContext}
+import sima.api.{ImageInfo, Parameters}
+import sttp.client3.{Response, UriContext, asByteArrayAlways, asStringAlways, basicRequest}
 import sttp.client3.httpclient.cats.HttpClientCatsBackend
 
 trait SimaClient[F[_]] {

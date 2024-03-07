@@ -19,4 +19,19 @@ lazy val root = (project in file("."))
     )
   )
 
+lazy val demo = (project in file("demo"))
+  .settings(BuildSettings.settings *)
+  .settings(libraryDependencies ++= Dependencies.demoDependencies)
+  .settings(
+    scalacOptions ++= Seq(
+      "-Ymacro-annotations",
+      "-unchecked",
+      "-deprecation",
+      "-Xfatal-warnings",
+      //      "-Xlint",
+      "-feature"
+    )
+  )
+  .dependsOn(root)
+
 releasePublishArtifactsAction := PgpKeys.publishSigned.key
