@@ -1,0 +1,37 @@
+ThisBuild / version := "0.1.0-SNAPSHOT"
+
+ThisBuild / scalaVersion := "2.13.13"
+
+lazy val root = (project in file("."))
+  .settings(
+    name := "sima"
+  )
+  .settings(BuildSettings.settings *)
+  .settings(libraryDependencies ++= Dependencies.allDependencies)
+  .settings(
+    scalacOptions ++= Seq(
+      "-Ymacro-annotations",
+      "-unchecked",
+      "-deprecation",
+      "-Xfatal-warnings",
+//      "-Xlint",
+      "-feature"
+    )
+  )
+
+lazy val demo = (project in file("demo"))
+  .settings(BuildSettings.settings *)
+  .settings(libraryDependencies ++= Dependencies.demoDependencies)
+  .settings(
+    scalacOptions ++= Seq(
+      "-Ymacro-annotations",
+      "-unchecked",
+      "-deprecation",
+      "-Xfatal-warnings",
+      //      "-Xlint",
+      "-feature"
+    )
+  )
+  .dependsOn(root)
+
+releasePublishArtifactsAction := PgpKeys.publishSigned.key

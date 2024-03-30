@@ -1,0 +1,9 @@
+.bsp/
+.idea/
+project/target/
+target/
+/out.*
+/*.png
+/*.webp
+/*.svg
+/*.jpg
