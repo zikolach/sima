@@ -7,7 +7,7 @@ lazy val root = (project in file("."))
     name := "sima"
   )
   .settings(BuildSettings.settings *)
-  .settings(libraryDependencies ++= Dependencies.allDependencies)
+  .settings(libraryDependencies ++= Dependencies.rootDependencies)
   .settings(
     scalacOptions ++= Seq(
       "-Ymacro-annotations",
@@ -18,6 +18,15 @@ lazy val root = (project in file("."))
       "-feature"
     )
   )
+
+lazy val integrationTest = (project in file("it"))
+  .settings(BuildSettings.commonSettings *)
+  .settings(
+    publish / skip := true,
+    libraryDependencies ++= Dependencies.itDependencies
+  )
+  .dependsOn(root)
+
 
 lazy val demo = (project in file("demo"))
   .settings(BuildSettings.settings *)

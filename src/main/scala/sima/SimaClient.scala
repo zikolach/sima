@@ -2,10 +2,12 @@ package sima
 
 import cats.implicits._
 import cats.effect.{Async, Resource}
+import io.circe.Decoder
 import io.circe.parser._
 import sima.api.{ImageInfo, Parameters}
-import sttp.client3.{Response, UriContext, asByteArrayAlways, asStringAlways, basicRequest}
+import sttp.client3.{asByteArrayAlways, asStringAlways, basicRequest, Response, UriContext}
 import sttp.client3.httpclient.cats.HttpClientCatsBackend
+import sttp.model.Uri
 
 trait SimaClient[F[_]] {
   def health: F[Boolean]
@@ -21,54 +23,37 @@ object SimaClient {
     HttpClientCatsBackend.resource[F]().map { backend =>
       new SimaClient[F] {
         override def health: F[Boolean] =
-          basicRequest.get(uri"${config.baseUrl}/health").response(asStringAlways).send(backend).map {
-            case x if x.is200 => true
-            case _            => false
-          }
-
-        override def info(imageData: Array[Byte]): F[ImageInfo] =
           basicRequest
-            .post(uri"${config.baseUrl}/info")
-            .body(imageData)
+            .get(uri"${config.baseUrl}/health")
             .response(asStringAlways)
             .send(backend)
+            .map(_.is200)
+
+        private def postImageData[R](url: Uri, imageData: Array[Byte])(implicit decoder: Decoder[R]): F[R] =
+          postImageDataRaw(url, imageData).flatMap(x => decode[R](new String(x)).liftTo[F])
+
+        private def postImageDataRaw(url: Uri, imageData: Array[Byte]): F[Array[Byte]] =
+          basicRequest
+            .post(url)
+            .body(imageData)
+            .response(asByteArrayAlways)
+            .send(backend)
             .flatMap {
-              case x if x.is200 => decode[ImageInfo](x.body).liftTo[F]
+              case x if x.is200 => x.body.pure[F]
               case x            => handleError(x)
             }
+
+        override def info(imageData: Array[Byte]): F[ImageInfo] =
+          postImageData(uri"${config.baseUrl}/info", imageData)
 
         override def resize(imageData: Array[Byte])(params: Parameters): F[Array[Byte]] =
-          basicRequest
-            .post(uri"${config.baseUrl}/resize".addParams(params.toQuery(Parameters.resize)))
-            .body(imageData)
-            .response(asByteArrayAlways)
-            .send(backend)
-            .flatMap {
-              case x if x.is200 => x.body.pure[F]
-              case x            => handleError(x)
-            }
+          postImageDataRaw(uri"${config.baseUrl}/resize".addParams(params.toQuery(Parameters.resize)), imageData)
 
         override def convert(imageData: Array[Byte])(params: Parameters): F[Array[Byte]] =
-          basicRequest
-            .post(uri"${config.baseUrl}/convert".addParams(params.toQuery(Parameters.convert)))
-            .body(imageData)
-            .response(asByteArrayAlways)
-            .send(backend)
-            .flatMap {
-              case x if x.is200 => x.body.pure[F]
-              case x            => handleError(x)
-            }
+          postImageDataRaw(uri"${config.baseUrl}/convert".addParams(params.toQuery(Parameters.convert)), imageData)
 
         override def fit(imageData: Array[Byte])(params: Parameters): F[Array[Byte]] =
-          basicRequest
-            .post(uri"${config.baseUrl}/convert".addParams(params.toQuery(Parameters.fit)))
-            .body(imageData)
-            .response(asByteArrayAlways)
-            .send(backend)
-            .flatMap {
-              case x if x.is200 => x.body.pure[F]
-              case x            => handleError(x)
-            }
+          postImageDataRaw(uri"${config.baseUrl}/fit".addParams(params.toQuery(Parameters.fit)), imageData)
       }
     }
 

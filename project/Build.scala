@@ -9,11 +9,14 @@ object BuildSettings {
   val buildVersion = "0.0.1"
   val buildScalaVersion = "2.13.13"
 
-  val settings = Seq(
+  val commonSettings = Seq(
     organization := buildOrganization,
     version := buildVersion,
     scalaVersion := buildScalaVersion,
     crossScalaVersions := Seq(scalaVersion.value),
+  )
+
+  val settings = commonSettings ++ Seq(
     publishMavenStyle := true,
     credentials += Credentials(Path.userHome / ".sbt" / ".credentials"),
     publishTo := {
@@ -59,16 +62,15 @@ object Dependencies {
   val sttp = "com.softwaremill.sttp.client3" %% "core" % sttpVersion
   val sttpCE = "com.softwaremill.sttp.client3" %% "fs2" % sttpVersion
 
-  val scalatest = "org.scalatest" %% "scalatest" % "3.2.17" % Test
-
   private val circeVersion = "0.14.6"
   val circeCore = "io.circe" %% "circe-core" % circeVersion
   val circeGeneric = "io.circe" %% "circe-generic" % circeVersion
   val circeParser = "io.circe" %% "circe-parser" % circeVersion
 
+  val scalatest = "org.scalatest" %% "scalatest" % "3.2.17" % Test
   val catsScalaTest = "org.typelevel" %% "cats-effect-testing-scalatest" % "1.5.0" % Test
+  val testContainers = "com.dimafeng" %% "testcontainers-scala-scalatest" % "0.41.2" % Test
 
-  val miscDependencies = Seq(catsEffect, sttp, sttpCE, circeCore, circeGeneric, circeParser)
   val testDependencies = Seq(scalatest, catsScalaTest)
 
   val PekkoVersion = "1.0.2"
@@ -80,9 +82,7 @@ object Dependencies {
   val scalatags = "com.lihaoyi" %% "scalatags" % "0.12.0"
   val slf4jSimple = "org.slf4j" % "slf4j-simple" % "2.0.12"
 
-  // val tapirPekko = "com.softwaremill.sttp.tapir" %% "tapir-pekko-http-server" % "1.9.11"
-
+  val rootDependencies = Seq(catsEffect, sttp, sttpCE, circeCore, circeGeneric, circeParser)
   val demoDependencies = Seq(pekkoActor, pekkoActorTyped, pekkoStream, pekkoHttp, scalatags, slf4jSimple)
-
-  val allDependencies = miscDependencies ++ testDependencies
+  val itDependencies = testDependencies :+ testContainers
 }
