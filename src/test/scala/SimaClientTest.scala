@@ -30,8 +30,8 @@ class SimaClientTest extends AsyncFlatSpec with AsyncIOSpec with should.Matchers
     val image = getClass.getResourceAsStream("test.webp").readAllBytes()
     implicit val clientConfig: ClientConfig = ClientConfig()
     SimaClient.client[IO].use(_.resize(image)(Parameters(width = Some(20)))).asserting { result =>
-      Files.write(Path.of("out.webp"), result)
-      result.length should be(394)
+      Files.write(Path.of("images/out.webp"), result)
+      result.length should be(360)
     }
   }
 
@@ -39,7 +39,7 @@ class SimaClientTest extends AsyncFlatSpec with AsyncIOSpec with should.Matchers
     val image = getClass.getResourceAsStream("debian.svg").readAllBytes()
     implicit val clientConfig: ClientConfig = ClientConfig()
     SimaClient.client[IO].use(_.convert(image)(Parameters(`type` = Some("png")))).asserting { result =>
-      Files.write(Path.of("out.png"), result)
+      Files.write(Path.of("images/out.png"), result)
       new String(result.slice(1, 4)) should be("PNG")
     }
   }
@@ -48,7 +48,7 @@ class SimaClientTest extends AsyncFlatSpec with AsyncIOSpec with should.Matchers
     val image = getClass.getResourceAsStream("debian.svg").readAllBytes()
     implicit val clientConfig: ClientConfig = ClientConfig()
     SimaClient.client[IO].use(_.convert(image)(Parameters(`type` = Some("png"), width = Some(50)))).asserting { result =>
-      Files.write(Path.of("fit.png"), result)
+      Files.write(Path.of("images/fit.png"), result)
       new String(result.slice(1, 4)) should be("PNG")
     }
   }

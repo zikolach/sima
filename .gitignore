@@ -3,7 +3,4 @@
 project/target/
 target/
 /out.*
-/*.png
-/*.webp
-/*.svg
-/*.jpg
+/images

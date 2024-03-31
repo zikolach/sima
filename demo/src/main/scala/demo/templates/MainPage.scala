@@ -28,7 +28,6 @@ object MainPage {
             input(`type` := "file", name := "file"),
             input(`type` := "submit", value := "Convert and resize")
           ),
-//          script(`type` := "text/javascript", src := "")
         )
       ).toString
     )

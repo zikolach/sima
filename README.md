@@ -15,6 +15,11 @@ It uses following libraries:
 To run API integration tests first start Imaginary server by running
 
 ```
-./run_image.sh
+docker-compose up -d
 ```
 
+Then run tests
+
+```
+sbt test
+```

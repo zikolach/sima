@@ -1,6 +1,9 @@
+//noinspection scala2InSource3
 import sbt.Keys._
+//noinspection scala2InSource3
 import sbt._
 
+//noinspection TypeAnnotation,ScalaUnnecessaryParentheses
 object BuildSettings {
   val buildOrganization = "com.github.zikolach"
   val buildVersion = "0.0.1"
@@ -20,29 +23,31 @@ object BuildSettings {
       else
         Some("releases" at nexus + "service/local/staging/deploy/maven2")
     },
-    publishArtifact in Test := false,
+    Test / publishArtifact := false,
     pomIncludeRepository := { _ =>
       false
     },
-    pomExtra := (<url>https://github.com/zikolach/sima</url>
-        <licenses>
-          <license>
-            <name>MIT</name>
-            <url>https://opensource.org/licenses/MIT</url>
-            <distribution>repo</distribution>
-          </license>
-        </licenses>
-        <scm>
-          <url>git@github.com:zikolach/sima.git</url>
-          <connection>scm:git:git@github.com:zikolach/sima.git</connection>
-        </scm>
-        <developers>
-          <developer>
-            <id>zikolach</id>
-            <name>Nikolay Kushin</name>
-            <url>http://example.com</url>
-          </developer>
-        </developers>)
+    pomExtra := (
+      <url>https://github.com/zikolach/sima</url>
+      <licenses>
+        <license>
+          <name>MIT</name>
+          <url>https://opensource.org/licenses/MIT</url>
+          <distribution>repo</distribution>
+        </license>
+      </licenses>
+      <scm>
+        <url>git@github.com:zikolach/sima.git</url>
+        <connection>scm:git:git@github.com:zikolach/sima.git</connection>
+      </scm>
+      <developers>
+        <developer>
+          <id>zikolach</id>
+          <name>Nikolay Kushin</name>
+          <url>http://example.com</url>
+        </developer>
+      </developers>
+    )
   )
 }
 
@@ -68,13 +73,16 @@ object Dependencies {
 
   val PekkoVersion = "1.0.2"
   val PekkoHttpVersion = "1.0.1"
+  val pekkoActor = "org.apache.pekko" %% "pekko-actor" % PekkoVersion
   val pekkoActorTyped = "org.apache.pekko" %% "pekko-actor-typed" % PekkoVersion
   val pekkoStream = "org.apache.pekko" %% "pekko-stream" % PekkoVersion
   val pekkoHttp = "org.apache.pekko" %% "pekko-http" % PekkoHttpVersion
-  val scalatags = "com.lihaoyi" %% "scalatags" % "0.8.2"
+  val scalatags = "com.lihaoyi" %% "scalatags" % "0.12.0"
+  val slf4jSimple = "org.slf4j" % "slf4j-simple" % "2.0.12"
+
   // val tapirPekko = "com.softwaremill.sttp.tapir" %% "tapir-pekko-http-server" % "1.9.11"
 
-  val demoDependencies = Seq(pekkoActorTyped, pekkoStream, pekkoHttp, scalatags)
+  val demoDependencies = Seq(pekkoActor, pekkoActorTyped, pekkoStream, pekkoHttp, scalatags, slf4jSimple)
 
   val allDependencies = miscDependencies ++ testDependencies
 }

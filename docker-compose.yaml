@@ -1,0 +1,9 @@
+version: "3"
+services:
+  imaginary:
+    image: "h2non/imaginary:latest"
+    environment:
+      PORT: 8080
+    command: "-enable-url-source"
+    ports:
+      - "8080:8080"
